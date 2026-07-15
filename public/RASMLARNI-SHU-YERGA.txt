@@ -1,0 +1,7 @@
+Rasmlarni shu papkaga tashlang:
+
+  muhlisa.jpg           — tepadagi kichik dumaloq rasm (200x200 px, kvadrat)
+  muhlisa-portret.jpg   — "Men haqimda" bo'limidagi katta rasm (800x1000 px, vertikal)
+
+Nomini o'zgartirsangiz, lib/content.ts dagi site.avatar va site.portrait ni ham yangilang.
+Rasm bo'lmasa sayt buzilmaydi — o'rniga "MA" harflari chiqib turadi.
