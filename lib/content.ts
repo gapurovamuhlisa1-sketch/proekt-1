@@ -14,8 +14,8 @@ export const site = {
    * Rasmlar. Fayllarni /public papkasiga tashlang.
    * Bo'sh qoldirsangiz — ism harflari (MA) ko'rinadi, sayt buzilmaydi.
    */
-  avatar: "/muhlisa.jpg", // tepadagi kichik dumaloq rasm — 200x200 px
-  portrait: "/muhlisa-portret.jpg", // "Men haqimda" bo'limidagi katta rasm — 800x1000 px
+  avatar: "/451.jpg", // tepadagi kichik dumaloq rasm — 200x200 px
+  portrait: "/451.jpg", // "Men haqimda" bo'limidagi katta rasm — 800x1000 px
 };
 
 export const hero = {

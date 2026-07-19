@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const DURATION_MS = 10_000;
+const DURATION_MS = 10_0000;
 const R = 54;
 const CIRCUMFERENCE = 2 * Math.PI * R;
 
 export function ThankYou({ channelUrl }: { channelUrl: string }) {
   const [progress, setProgress] = useState(0); // 0 -> 1
-  const [seconds, setSeconds] = useState(10);
+  const [seconds, setSeconds] = useState(15);
   const done = useRef(false);
 
   useEffect(() => {
