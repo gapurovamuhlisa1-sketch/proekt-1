@@ -4,7 +4,7 @@ import { PurchaseForm } from "@/components/PurchaseForm";
 import { CURRENCY } from "@/lib/meta";
 
 export const metadata: Metadata = {
-  title: "Sotuvni qayd etish",
+  title: "Sotuvni qayd etish.",
   robots: { index: false, follow: false },
 };
 
