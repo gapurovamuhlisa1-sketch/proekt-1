@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import { validateLead } from "@/lib/validation";
 import { sendToTelegram } from "@/lib/telegram";
 import { sendMetaLead } from "@/lib/meta";
+import { seal, type SealedLead } from "@/lib/crypto";
 
 export type LeadState = {
   status: "idle" | "ok" | "error";
@@ -20,6 +21,19 @@ const UTM_KEYS = [
   "utm_content",
   "utm_term",
 ] as const;
+
+function siteOrigin(fallbackUrl?: string) {
+  const base = process.env.NEXT_PUBLIC_SITE_URL;
+  if (base) return base.replace(/\/+$/, "");
+  if (fallbackUrl) {
+    try {
+      return new URL(fallbackUrl).origin;
+    } catch {
+      /* ignore */
+    }
+  }
+  return "";
+}
 
 export async function submitLead(
   _prev: LeadState,
@@ -46,6 +60,8 @@ export async function submitLead(
     h.get("x-real-ip") ||
     undefined;
   const clientUserAgent = h.get("user-agent") ?? undefined;
+  const fbp = c.get("_fbp")?.value;
+  const fbc = c.get("_fbc")?.value;
 
   const utm: Record<string, string> = {};
   for (const key of UTM_KEYS) {
@@ -58,9 +74,29 @@ export async function submitLead(
     process.env.NEXT_PUBLIC_SITE_URL ||
     undefined;
 
-  // Ikkalasi parallel ketadi. Telegram — biznes uchun, CAPI — Meta uchun.
+  // Purchase uchun mijoz ma'lumotlarini shifrlaymiz va himoyalangan havola quramiz.
+  let purchaseUrl: string | undefined;
+  try {
+    const sealed: SealedLead = {
+      name,
+      phone,
+      fbp,
+      fbc,
+      ip: clientIp,
+      ua: clientUserAgent,
+      url: pageUrl,
+      ts: Date.now(),
+    };
+    const token = seal(sealed);
+    const origin = siteOrigin(pageUrl);
+    if (origin) purchaseUrl = `${origin}/sotuv?t=${token}`;
+  } catch (err) {
+    // LEAD_SECRET yo'q bo'lsa havola bo'lmaydi, lekin ariza baribir tushadi.
+    console.error("[lead] havola yaratilmadi:", err);
+  }
+
   const [telegramOk] = await Promise.all([
-    sendToTelegram({ name, phone, utm, pageUrl, ip: clientIp }),
+    sendToTelegram({ name, phone, utm, pageUrl, ip: clientIp, purchaseUrl }),
     sendMetaLead({
       eventId,
       name,
@@ -68,12 +104,11 @@ export async function submitLead(
       eventSourceUrl: pageUrl,
       clientIp,
       clientUserAgent,
-      fbp: c.get("_fbp")?.value,
-      fbc: c.get("_fbc")?.value,
+      fbp,
+      fbc,
     }),
   ]);
 
-  // Telegram tushmasa — ariza yo'qoladi, shuning uchun faqat shu blokirovka qiladi.
   if (!telegramOk) {
     return {
       status: "error",
