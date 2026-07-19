@@ -16,6 +16,7 @@ export default async function SotuvPage({
 }: {
   searchParams: Promise<{ t?: string }>;
 }) {
+
   const { t } = await searchParams;
   const lead = t ? open<SealedLead>(t) : null;
 
